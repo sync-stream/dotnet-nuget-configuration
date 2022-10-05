@@ -45,7 +45,7 @@
         <TargetFramework>net6.0</TargetFramework>
 
         <!-- Define the package version -->
-        <Version>1.0.15</Version>
+        <Version>1.0.16</Version>
     </PropertyGroup>
 
     <!-- Define the package's NuGet dependencies -->
@@ -53,19 +53,19 @@
 
         <!-- We'll need the Microsoft Configuration Extension -->
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
-        
+
         <!-- We'll need to pull configuration values from the environment -->
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.1" />
-        
+
         <!-- We'll need to pull configuration values from JSON -->
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-        
+
         <!-- We'll need to pull configuration values from XML -->
         <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="6.0.0" />
 
         <!-- We'll need our serializer -->
         <PackageReference Include="SyncStream.Serializer" Version="1.0.9" />
-        
+
     </ItemGroup>
 
     <!-- Include our assets -->

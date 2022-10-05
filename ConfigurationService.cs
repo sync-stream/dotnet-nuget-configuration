@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Reflection;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using SyncStream.Serializer;
 
@@ -58,6 +59,17 @@ public class ConfigurationService
         // Iterate over the files
         foreach (string file in files)
         {
+            // Localize the file path
+            string filePath = file;
+
+            // Check to see if the file exists and reset the file path
+            if (!File.Exists(filePath))
+                filePath = Path.Combine(Path.GetPathRoot(Assembly.GetExecutingAssembly().Location) ?? "/",
+                    filePath ?? string.Empty);
+
+            // Check again for the file, this time skip the iteration
+            if (!File.Exists(filePath)) continue;
+
             // Check for XML and add the XML file
             if (file.ToLower().Trim().EndsWith(".xml"))
                 configurationBuilder.AddXmlFile(source =>
