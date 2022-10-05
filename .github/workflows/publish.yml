@@ -1,0 +1,27 @@
+name: 'Publish'
+on:
+  push:
+    branches:
+      - 'main'
+jobs:
+
+  ## Publish Job
+  publish:
+    name: 'NuGet Build & Publish'
+    runs-on: 'ubuntu-latest'
+    steps:
+
+      ## Checkout
+      - name: 'Checkout'
+        uses: 'actions/checkout@v2'
+
+      ## Publish
+      - name: 'Publish'
+        id: 'publish_nuget'
+        uses: 'brandedoutcast/publish-nuget@v2'
+        with:
+          INCLUDE_SYMBOLS: false
+          NUGET_KEY: ${{ secrets.SS_NUGET_API_KEY }}
+          PACKAGE_NAME: 'SyncStream.Configuration'
+          PROJECT_FILE_PATH: 'SyncStream.Configuration.csproj'
+          TAG_COMMIT: false
