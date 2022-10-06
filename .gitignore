@@ -794,3 +794,8 @@ e2e/*.map
 # End of https://www.toptal.com/developers/gitignore/api/angular
 
 https:
+Program.cs
+appsettings.json
+appsettings.*.json
+appsettings.xml
+appsettings.*.xml

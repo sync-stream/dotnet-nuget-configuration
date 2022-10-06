@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 // Define our namespace
@@ -15,14 +16,8 @@ public static class SyncStreamConfigurationServiceCollectionExtensions
     /// <param name="configurationFiles">The configuration files to add</param>
     /// <returns><paramref name="instance" /></returns>
     public static IServiceCollection UseSyncStreamConfiguration(this IServiceCollection instance,
-        IEnumerable<string> configurationFiles)
-    {
-        // Configure the library
-        ConfigurationService.Configure(configurationFiles);
-
-        // We're done, return the IServiceCollection instance
-        return instance;
-    }
+        IEnumerable<string> configurationFiles) => instance.AddOptions()
+        .Configure<IConfiguration>(ConfigurationService.Configure(configurationFiles));
 
     /// <summary>
     ///     This method adds <paramref name="configurationFiles" /> into the application's configuration profile

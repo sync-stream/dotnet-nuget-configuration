@@ -25,7 +25,14 @@ public class ConfigurationService
     ///     This method configures the service with a new <paramref name="configuration" /> instance
     /// </summary>
     /// <param name="configuration">The configuration instance to use</param>
-    public static void Configure(IConfiguration configuration) => Configuration = configuration;
+    public static IConfiguration Configure(IConfiguration configuration)
+    {
+        // Set the configuration instance into the service
+        Configuration = configuration;
+
+        // We're done, return the configuration instance from the service
+        return Configuration = configuration;
+    }
 
     /// <summary>
     ///     This method reads a <paramref name="file" /> into a configuration instance
@@ -100,7 +107,7 @@ public class ConfigurationService
         }
 
         // We're done, return the configuration
-        return configurationBuilder.Build();
+        return Configure(configurationBuilder.Build());
     }
 
     /// <summary>
@@ -160,9 +167,28 @@ public class ConfigurationService
     /// </summary>
     /// <param name="variableName">The name of the configuration key for which to return the value</param>
     /// <returns>The string value of <paramref name="variableName" /></returns>
-    public static string GetValue(string variableName) =>
-        ReplaceVariableReferences(
-            ReplaceEnvironmentVariableReferences(Configuration[NormalizeVariableName(variableName.Trim())]));
+    public static string GetValue(string variableName)
+    {
+        // Localize the normalized variable name
+        variableName = NormalizeVariableName(variableName);
+
+        // Localize the value
+        string value = Configuration[variableName];
+
+        // Check for any variable references
+        if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value) && Regex.IsMatch(value, @"\$\{.*\}",
+                RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline))
+        {
+            // Make any environment variable reference replacements
+            value = ReplaceEnvironmentVariableReferences(value);
+
+            // Make any variable reference replacements
+            value = ReplaceEnvironmentVariableReferences(value);
+        }
+
+        // We're done, return the value
+        return value;
+    }
 
     /// <summary>
     ///     This method returns the <typeparamref name="TValue" /> typed value
@@ -174,21 +200,43 @@ public class ConfigurationService
     /// <returns><typeparamref name="TValue" /> typed value of <paramref name="variableName" /> from the service's configuration</returns>
     public static TValue GetValue<TValue>(string variableName, SerializerFormat format = SerializerFormat.None)
     {
+        // Normalize the variable name
+        variableName = NormalizeVariableName(variableName);
+
+        // Define our response
+        TValue response;
+
         // Try to get the value directly from the configuration
         try
         {
 
-            // We're done, return the value directly from the configuration
-            return Configuration.GetValue<TValue>(NormalizeVariableName(variableName));
+            // We're done, return the value directly from the configuration section
+            response = Configuration.GetSection(variableName).Get<TValue>();
         }
 
-        // Otherwise, use our converter
-        catch (Exception)
+        // Otherwise, try getting the value directly
+        catch (Exception e)
         {
 
-            // We're done, return our converter's response
-            return GetTypedValue<TValue>(GetValue(variableName), format);
+            Console.Write(e);
+
+            // Try to get the value directly
+            try
+            {
+                // Get the typed value directly from the configuration key value
+                response = Configuration.GetValue<TValue>(variableName);
+            }
+            catch (Exception ee)
+            {
+                Console.Write(ee);
+
+                // Use our converter to marshall the response
+                response = GetTypedValue<TValue>(variableName, format);
+            }
         }
+
+        // We're done, send the response
+        return response;
     }
 
     /// <summary>
@@ -196,9 +244,11 @@ public class ConfigurationService
     ///     and replaces any environment or variable references
     /// </summary>
     /// <param name="variableName">The environment variable name to normalize</param>
+    /// <param name="environment">Flag denoting whether to normalize for the environment or not</param>
     /// <returns>The normalized <paramref name="variableName" /></returns>
-    public static string NormalizeVariableName(string variableName) => ReplaceVariableReferences(
-        ReplaceEnvironmentVariableReferences(Regex.Replace(variableName, @"\/|::|-\>", "_",
+    public static string NormalizeVariableName(string variableName, bool environment = false) =>
+        ReplaceVariableReferences(ReplaceEnvironmentVariableReferences(Regex.Replace(variableName,
+            environment ? @":|\.|\/|::|-\>" : @"\/|::|-\>", environment ? "_" : ":",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline)));
 
     /// <summary>
