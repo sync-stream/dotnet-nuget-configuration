@@ -162,7 +162,7 @@ public class ConfigurationService
     /// <returns>The string value of <paramref name="variableName" /></returns>
     public static string GetValue(string variableName) =>
         ReplaceVariableReferences(
-            ReplaceEnvironmentVariableReferences(Configuration[NormalizeVariableName(variableName)]));
+            ReplaceEnvironmentVariableReferences(Configuration[NormalizeVariableName(variableName.Trim())]));
 
     /// <summary>
     ///     This method returns the <typeparamref name="TValue" /> typed value
@@ -172,8 +172,24 @@ public class ConfigurationService
     /// <param name="format">Optional, serialization format used</param>
     /// <typeparam name="TValue">The expected type of the resulting object</typeparam>
     /// <returns><typeparamref name="TValue" /> typed value of <paramref name="variableName" /> from the service's configuration</returns>
-    public static TValue GetValue<TValue>(string variableName, SerializerFormat format = SerializerFormat.None) =>
-        GetTypedValue<TValue>(GetValue(variableName), format);
+    public static TValue GetValue<TValue>(string variableName, SerializerFormat format = SerializerFormat.None)
+    {
+        // Try to get the value directly from the configuration
+        try
+        {
+
+            // We're done, return the value directly from the configuration
+            return Configuration.GetValue<TValue>(NormalizeVariableName(variableName));
+        }
+
+        // Otherwise, use our converter
+        catch (Exception)
+        {
+
+            // We're done, return our converter's response
+            return GetTypedValue<TValue>(GetValue(variableName), format);
+        }
+    }
 
     /// <summary>
     ///     This method normalizes <paramref name="variableName" />
