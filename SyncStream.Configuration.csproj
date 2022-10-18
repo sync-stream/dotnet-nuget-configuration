@@ -2,7 +2,7 @@
 
     <!-- Define our package's properties -->
     <PropertyGroup>
-        
+
         <!-- Define our author -->
         <Authors>syncstream-devops</Authors>
 
@@ -45,7 +45,7 @@
         <TargetFramework>net6.0</TargetFramework>
 
         <!-- Define the package version -->
-        <Version>1.0.18</Version>
+        <Version>1.0.20</Version>
     </PropertyGroup>
 
     <!-- Define the package's NuGet dependencies -->

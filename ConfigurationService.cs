@@ -31,14 +31,8 @@ public class ConfigurationService
         Configuration = configuration;
 
         // We're done, return the configuration instance from the service
-        return Configuration = configuration;
+        return Configuration;
     }
-
-    /// <summary>
-    ///     This method reads a <paramref name="file" /> into a configuration instance
-    /// </summary>
-    /// <param name="file">The file to populate the configuration instance with</param>
-    public static IConfiguration Configure(string file) => Configure(new[] { file });
 
     /// <summary>
     ///     This method reads <paramref name="files" /> into the <paramref name="configurationBuilder" />
@@ -54,13 +48,6 @@ public class ConfigurationService
         {
             // Define our configuration builder
             configurationBuilder = new();
-
-            // Add the environment to the configuration builder
-            configurationBuilder.AddEnvironmentVariables(source =>
-            {
-                // We'll need a prefix
-                source.Prefix = EnvironmentPrefix;
-            });
         }
 
         // Iterate over the files
@@ -71,8 +58,9 @@ public class ConfigurationService
 
             // Check to see if the file exists and reset the file path
             if (!File.Exists(filePath))
-                filePath = Path.Combine(Path.GetPathRoot(Assembly.GetExecutingAssembly().Location) ?? "/",
-                    filePath ?? string.Empty);
+                filePath = Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ??
+                    Path.DirectorySeparatorChar.ToString(), filePath ?? string.Empty);
 
             // Check again for the file, this time skip the iteration
             if (!File.Exists(filePath)) continue;
@@ -155,10 +143,10 @@ public class ConfigurationService
             // We're done deserialize and return the value
             return SerializerService.Deserialize<TValue>(source, format);
         }
-        catch (Exception)
+        catch (System.Exception)
         {
             // We're done, change the type of the value and return it
-            return (TValue)Convert.ChangeType(source, typeof(TValue));
+            return (TValue) Convert.ChangeType(source, typeof(TValue));
         }
     }
 
@@ -203,40 +191,28 @@ public class ConfigurationService
         // Normalize the variable name
         variableName = NormalizeVariableName(variableName);
 
-        // Define our response
-        TValue response;
-
         // Try to get the value directly from the configuration
         try
         {
-
             // We're done, return the value directly from the configuration section
-            response = Configuration.GetSection(variableName).Get<TValue>();
+            return Configuration.GetSection(variableName).Get<TValue>();
         }
 
         // Otherwise, try getting the value directly
-        catch (Exception e)
+        catch (System.Exception)
         {
-
-            Console.Write(e);
-
             // Try to get the value directly
             try
             {
                 // Get the typed value directly from the configuration key value
-                response = Configuration.GetValue<TValue>(variableName);
+                return Configuration.GetValue<TValue>(variableName);
             }
-            catch (Exception ee)
+            catch (System.Exception)
             {
-                Console.Write(ee);
-
                 // Use our converter to marshall the response
-                response = GetTypedValue<TValue>(variableName, format);
+                return GetTypedValue<TValue>(variableName, format);
             }
         }
-
-        // We're done, send the response
-        return response;
     }
 
     /// <summary>
