@@ -143,7 +143,7 @@ public class ConfigurationService
             // We're done deserialize and return the value
             return SerializerService.Deserialize<TValue>(source, format);
         }
-        catch (System.Exception)
+        catch (Exception)
         {
             // We're done, change the type of the value and return it
             return (TValue) Convert.ChangeType(source, typeof(TValue));
@@ -199,7 +199,7 @@ public class ConfigurationService
         }
 
         // Otherwise, try getting the value directly
-        catch (System.Exception)
+        catch (Exception)
         {
             // Try to get the value directly
             try
@@ -207,7 +207,7 @@ public class ConfigurationService
                 // Get the typed value directly from the configuration key value
                 return Configuration.GetValue<TValue>(variableName);
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 // Use our converter to marshall the response
                 return GetTypedValue<TValue>(variableName, format);
