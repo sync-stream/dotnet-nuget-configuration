@@ -799,3 +799,5 @@ appsettings.json
 appsettings.*.json
 appsettings.xml
 appsettings.*.xml
+
+SyncStream.Configuration.xml
