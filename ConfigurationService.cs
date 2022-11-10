@@ -221,7 +221,7 @@ public class ConfigurationService
     /// <param name="format">Optional, serialization format used</param>
     /// <typeparam name="TValue">The expected type of the resulting object</typeparam>
     /// <returns><typeparamref name="TValue" /> typed value from the service's configuration</returns>
-    public TValue GetValue<TValue>(SerializerFormat format = SerializerFormat.None)
+    public static TValue GetValue<TValue>(SerializerFormat format = SerializerFormat.None)
     {
         // Localize our type
         Type valueType = typeof(TValue);

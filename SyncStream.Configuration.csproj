@@ -45,7 +45,7 @@
         <TargetFramework>net6.0</TargetFramework>
 
         <!-- Define the package version -->
-        <Version>1.1.10</Version>
+        <Version>1.1.12</Version>
     </PropertyGroup>
 
     <!-- Define the package's NuGet dependencies -->
