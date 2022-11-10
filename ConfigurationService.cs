@@ -216,6 +216,25 @@ public class ConfigurationService
     }
 
     /// <summary>
+    ///     This method returns the <typeparamref name="TValue" /> typed value from the service's configuration
+    /// </summary>
+    /// <param name="format">Optional, serialization format used</param>
+    /// <typeparam name="TValue">The expected type of the resulting object</typeparam>
+    /// <returns><typeparamref name="TValue" /> typed value from the service's configuration</returns>
+    public TValue GetValue<TValue>(SerializerFormat format = SerializerFormat.None)
+    {
+        // Localize our type
+        Type valueType = typeof(TValue);
+
+        // Localize our attribute
+        ConfigurationSectionNameAttribute attribute =
+            valueType.GetCustomAttribute<ConfigurationSectionNameAttribute>(false) ?? new(valueType.Name);
+
+        // We're done, return the value from the configuration
+        return GetValue<TValue>(attribute.SectionName, format);
+    }
+
+    /// <summary>
     ///     This method normalizes <paramref name="variableName" />
     ///     and replaces any environment or variable references
     /// </summary>
